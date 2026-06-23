@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Zoltan</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #eeebff;
+            --bg: #f9fafb;
+            --card: #ffffff;
+            --text: #111827;
+            --text-muted: #6b7280;
+            --border: #e5e7eb;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar Layout */
+        .sidebar {
+            width: 260px;
+            background: var(--card);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 2rem 1.5rem;
+            box-sizing: border-box;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 2.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            height: 100%;
+        }
+
+        .nav-item a {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .nav-item.active a,
+        .nav-item a:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        /* Main Content Container */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .header {
+            background: var(--card);
+            padding: 1.5rem 2.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 500;
+        }
+
+        .avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        .content-body {
+            padding: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .welcome-section {
+            background: linear-gradient(135deg, #4f46e5, #6366f1);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+        }
+
+        .welcome-section h1 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.75rem;
+        }
+
+        .welcome-section p {
+            margin: 0;
+            opacity: 0.9;
+        }
+
+        /* Grid Cards Layout */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 900px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-top: 0;
+            margin-bottom: 1.25rem;
+        }
+
+        /* Task/Schedule List */
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        /* Quick Actions Menu */
+        .btn-action {
+            display: block;
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--primary-light);
+            color: var(--primary);
+            text-align: center;
+            text-decoration: none;
+            font-weight: 600;
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            box-sizing: border-box;
+            transition: background 0.2s;
+        }
+
+        .btn-action:hover {
+            background: #e0daff;
+        }
+    </style>
+</head>
+
+<body>
+
+    {% csrf_token %}
+
+    <aside class="sidebar">
+        <div class="logo">⚡ Zoltan</div>
+        <ul class="nav-links">
+            <li class="nav-item active" id="nav-dash"><a href="#" onclick="switchWorkspaceTab('dashboard-view')">📊 Dashboard</a></li>
+            <li class="nav-item" id="nav-profile"><a href="#" onclick="switchWorkspaceTab('profile-view')">👤 Profile Settings</a></li>
+            <li class="nav-item" style="margin-top: auto;">
+                <a href="{% url 'logout_action' %}" style="color: #ef4444; background: #fef2f2;">🚪 End Workspace Session</a>
+            </li>
+        </ul>
+    </aside>
+
+    <main class="main-content">
+        <header class="header">
+            <div style="font-weight: 600; font-size: 1.1rem;">Workspace</div>
+            <div class="user-profile">
+                <div class="avatar">A</div>
+                <span>Administrator</span>
+            </div>
+        </header>
+
+        <div id="dashboard-view" class="tab-content">
+            <div class="content-body">
+                <section class="welcome-section">
+                    <h1>Welcome to your Zoltan Engine Dashboard</h1>
+                    <p>Your centralized workspace for tracking daily tasks, learning roadmaps, and interview analytics is active.</p>
+                </section>
+
+                <div class="dashboard-grid">
+                    <div style="display: flex; flex-direction: column; gap: 2rem;">
+
+                        <div class="card">
+                            <h3 class="card-title">📅 Today's Focus Routine</h3>
+                            <div class="task-list">
+                                {% for task in tasks %}
+                                <div class="task-item" style="display: flex; align-items: center; gap: 0.75rem;">
+                                    <input type="checkbox" class="task-checkbox" data-id="{{ task.id }}" {% if task.is_completed %}checked{% endif %} onchange="toggleTaskStatus(this)">
+                                    <span {% if task.is_completed %} style="text-decoration: line-through; color: var(--text-muted);" {% endif %}>
+                                        {{ task.title }}
+                                        <small style="background: var(--primary-light); color: var(--primary); padding: 0.1rem 0.4rem; border-radius: 4px; font-size: 0.75rem; margin-left: 0.5rem;">
+                                            {{ task.category }}
+                                        </small>
+                                    </span>
+                                </div>
+                                {% empty %}
+                                <p style="color: var(--text-muted); font-size: 0.9rem;">No schedule parameters logged.</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h3 class="card-title">💼 Live Discovered Positions</h3>
+                            <div class="task-list">
+                                {% if opportunities %}
+                                {% for op in opportunities %}
+                                <div class="task-item" style="justify-content: space-between; align-items: center; display: flex;">
+                                    <div>
+                                        <strong style="color: var(--primary);">{{ op.title }}</strong>
+                                        <span style="color: var(--text-muted); font-size: 0.9rem;">— {{ op.company }}</span>
+                                        <br>
+                                        <small style="color: var(--text-muted);">📍 {{ op.location }} | 🔍 via {{ op.source }}</small>
+                                    </div>
+                                    <a href="{{ op.apply_url }}" target="_blank" style="text-decoration: none; background: var(--primary); color: white; padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600;">Apply</a>
+                                </div>
+                                {% endfor %}
+                                {% else %}
+                                <div style="text-align: center; color: var(--text-muted); padding: 2rem 0;">
+                                    <p>No listings found in the data repository yet.</p>
+                                    <small>Click "Scrape New Opportunities" on the right sidebar panel to populate data instantly.</small>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h3 class="card-title">🧠 Target Learning Paths</h3>
+                            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                                {% for track in tracks %}
+                                <div style="border: 1px solid var(--border); padding: 1rem; border-radius: 8px; background: var(--bg);">
+                                    <h4 style="margin: 0 0 0.75rem 0; color: var(--primary); font-size: 1rem;">{{ track.title }}</h4>
+                                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                        {% for milestone in track.milestones.all %}
+                                        <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem;">
+                                            <input type="checkbox" class="milestone-checkbox" data-id="{{ milestone.id }}" {% if milestone.is_mastered %}checked{% endif %} onchange="toggleMilestoneStatus(this)">
+                                            <span {% if milestone.is_mastered %} style="text-decoration: line-through; color: var(--text-muted);" {% endif %}>
+                                                {{ milestone.title }}
+                                            </span>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <p style="color: var(--text-muted); font-size: 0.9rem;">No learning modules registered.</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                <h3 class="card-title" style="margin:0;">💼 Active Interview Pipelines</h3>
+                                <button onclick="toggleInterviewModal(true)" style="background: var(--primary); color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: 600;">+ Add Interview</button>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                                {% for interview in interviews %}
+                                <div style="border: 1px solid var(--border); padding: 1.25rem; border-radius: 8px; background: var(--card);">
+                                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                                        <div>
+                                            <strong style="font-size: 1.1rem; color: var(--text);">{{ interview.company_name }}</strong>
+                                            <span style="color: var(--text-muted); font-size: 0.9rem;"> — {{ interview.role_title }}</span>
+                                        </div>
+                                        <span style="background: #eeebff; color: var(--primary); font-size: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 4px; font-weight: 600;">{{ interview.status }}</span>
+                                    </div>
+                                    <p style="margin: 0; font-size: 0.85rem; color: var(--text-muted);">Scheduled Date: {{ interview.date_scheduled|date:"M d, Y" }}</p>
+                                </div>
+                                {% empty %}
+                                <p style="color: var(--text-muted); font-size: 0.9rem;">No upcoming custom corporate pipeline tracks mapped.</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div>
+                        <div class="card" style="margin-bottom: 2rem;">
+                            <h3 class="card-title">📈 Scraper Engine Insights</h3>
+                            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                <div>
+                                    <span style="color: var(--text-muted); font-size: 0.9rem;">Total Jobs Monitored:</span>
+                                    <strong style="font-size: 1.2rem; color: var(--primary); display: block;">{{ insights.total_records }}</strong>
+                                </div>
+                                <hr style="border: 0; border-top: 1px solid var(--border); margin: 0.5rem 0;">
+                                <div>
+                                    <span style="color: var(--text-muted); font-size: 0.9rem; font-weight: 600;">🔥 Top Markets</span>
+                                    <ul style="padding-left: 1.2rem; margin: 0.5rem 0; font-size: 0.9rem; color: var(--text);">
+                                        {% for loc in insights.top_locations %}
+                                        <li>{{ loc.location }} ({{ loc.count }} listings)</li>
+                                        {% empty %}
+                                        <li style="color: var(--text-muted);">No location data compiled yet.</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h3 class="card-title">⚡ Quick Accelerators</h3>
+                            <a href="#" class="btn-action">🤖 Launch AI Mock Interview</a>
+                            <a href="#" id="scraper-btn" class="btn-action">🛠️ Scrape New Opportunities</a>
+                            <a href="#" class="btn-action">📊 Generate Predictive Analytics</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="profile-view" class="tab-content" style="display: none;">
+            <div class="content-body">
+                <div class="card" style="max-width: 800px; margin: 0 auto;">
+                    <h3 class="card-title" style="font-size: 1.3rem; border-bottom: 1px solid var(--border); padding-bottom: 0.75rem;">👤 System Profile Configuration</h3>
+                    
+                    <div style="display: flex; gap: 2rem; align-items: center; margin-bottom: 2rem; background: var(--bg); padding: 1.5rem; border-radius: 8px;">
+                        <div style="width: 70px; height: 70px; border-radius: 50%; background: var(--primary); color: white; display: flex; justify-content: center; align-items: center; font-size: 2rem; font-weight: bold;">
+                            A
+                        </div>
+                        <div>
+                            <h4 style="margin: 0 0 0.25rem 0; font-size: 1.2rem;">Administrator Account</h4>
+                            <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">Status: Secure Active Infrastructure Session</p>
+                        </div>
+                    </div>
+
+                    <div style="border-top: 1px solid var(--border); padding-top: 1.5rem;">
+                        <h4 style="margin: 0 0 1rem 0; font-size: 1rem; color: var(--text);">🚀 Tracked System Metrics Summary</h4>
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left;">
+                            <thead>
+                                <tr style="border-bottom: 2px solid var(--border); color: var(--text-muted);">
+                                    <th style="padding: 0.5rem 0;">Asset Log Parameter</th>
+                                    <th style="padding: 0.5rem 0;">Status Value Mapping</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid var(--border);">
+                                    <td style="padding: 0.75rem 0;">Linked Repository Integration Engine</td>
+                                    <td style="color: #10b981; font-weight: 600;">Active Git Branch Tracker Integration</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid var(--border);">
+                                    <td style="padding: 0.75rem 0;">Verified Practical Internship Registries</td>
+                                    <td style="color: var(--primary); font-weight: 600;">Authenticated Profiles Logged</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+
+    <!-- =====================================================================
+     ➕ ADD NEW INTERVIEW PIPELINE MODAL
+     ===================================================================== -->
+<div id="interview-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000;">
+    <div class="card" style="width: 100%; max-width: 450px; box-sizing: border-box; margin: 1rem;">
+        <h3 class="card-title" style="font-size: 1.2rem; margin-bottom: 1.5rem;">➕ Add Interview Track</h3>
+        
+        <form id="interview-form" style="display: flex; flex-direction: column; gap: 1rem;">
+            <div>
+                <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--text-muted);">Company Name</label>
+                <input type="text" name="company_name" required style="width: 100%; padding: 0.6rem; border: 1px solid var(--border); border-radius: 6px; box-sizing: border-box;">
+            </div>
+            
+            <div>
+                <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--text-muted);">Role Title</label>
+                <input type="text" name="role_title" required style="width: 100%; padding: 0.6rem; border: 1px solid var(--border); border-radius: 6px; box-sizing: border-box;">
+            </div>
+            
+            <div>
+                <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--text-muted);">Pipeline Status</label>
+                <select name="status" style="width: 100%; padding: 0.6rem; border: 1px solid var(--border); border-radius: 6px; box-sizing: border-box; background: white;">
+                    <option value="Applied">Applied</option>
+                    <option value="Screening">Screening</option>
+                    <option value="Technical Interview">Technical Interview</option>
+                    <option value="Managerial">Managerial Round</option>
+                    <option value="Offer Extended">Offer Extended</option>
+                </select>
+            </div>
+            
+            <div>
+                <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--text-muted);">Scheduled Date</label>
+                <input type="date" name="date_scheduled" required style="width: 100%; padding: 0.6rem; border: 1px solid var(--border); border-radius: 6px; box-sizing: border-box;">
+            </div>
+            
+            <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1rem;">
+                <button type="button" onclick="toggleInterviewModal(false)" style="background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600;">Cancel</button>
+                <button type="submit" style="background: var(--primary); border: none; color: white; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600;">Save Pipeline</button>
+            </div>
+        </form>
+    </div>
+</div>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Company</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if interviews %}
+            {% for interview in interviews %}
+            <tr>
+                <td><strong>{{ interview.company_name }}</strong></td>
+                <td>{{ interview.role_title }}</td>
+                <td>
+                    <span class="badge 
+                        {% if interview.status == 'Applied' %}badge-info
+                        {% elif interview.status == 'Screening' %}badge-warning
+                        {% elif 'Interview' in interview.status or 'Round' in interview.status %}badge-primary
+                        {% elif interview.status == 'Offer Extended' %}badge-success
+                        {% else %}badge-secondary{% endif %}">
+                        {{ interview.status }}
+                    </span>
+                </td>
+                <td>{{ interview.date_scheduled }}</td>
+            </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                    No active interview tracks found. Click "+ Add Interview" to start tracking!
+                </td>
+            </tr>
+        {% endif %}
+    </tbody>
+</table>
+    <script>
+        // 1. Workspace Component View Tab Switcher 
+        function switchWorkspaceTab(tabId) {
+            // Hide all views
+            document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+            // Show targeted view
+            document.getElementById(tabId).style.display = 'block';
+
+            // Reset navigation active state
+            document.getElementById('nav-dash').classList.remove('active');
+            document.getElementById('nav-profile').classList.remove('active');
+
+            // Set current element active state
+            if (tabId === 'dashboard-view') document.getElementById('nav-dash').classList.add('active');
+            if (tabId === 'profile-view') document.getElementById('nav-profile').classList.add('active');
+        }
+
+        // 2. Scraper Execution Logic
+        document.getElementById('scraper-btn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            const btn = e.target;
+
+            btn.innerText = "⏳ Running Extraction...";
+            btn.style.opacity = "0.6";
+            btn.style.pointerEvents = "none";
+
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+
+            try {
+                const response = await fetch('/api/run-scraper/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrfToken
+                    }
+                });
+                const data = await response.json();
+
+                if (response.ok && data.status === 'success') {
+                    alert(data.message);
+                    window.location.reload();
+                } else {
+                    alert("Scraping execution halted by system rules.");
+                }
+            } catch (err) {
+                alert("Connection anomaly encountered running background scraper script.");
+            } finally {
+                btn.innerText = "🛠️ Scrape New Opportunities";
+                btn.style.opacity = "1";
+                btn.style.pointerEvents = "auto";
+            }
+        });
+
+        // 3. Schedule Task Toggle Logic
+        async function toggleTaskStatus(checkboxElement) {
+            const taskId = checkboxElement.getAttribute('data-id');
+            const labelSpan = checkboxElement.nextElementSibling;
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+
+            try {
+                const response = await fetch(`/api/tasks/${taskId}/toggle/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrfToken
+                    }
+                });
+                const data = await response.json();
+
+                if (response.ok && data.status === 'success') {
+                    if (data.is_completed) {
+                        labelSpan.style.textDecoration = "line-through";
+                        labelSpan.style.color = "var(--text-muted)";
+                    } else {
+                        labelSpan.style.textDecoration = "none";
+                        labelSpan.style.color = "var(--text)";
+                    }
+                } else {
+                    alert("Status alteration rejected by core engine.");
+                    checkboxElement.checked = !checkboxElement.checked;
+                }
+            } catch (err) {
+                alert("Network pipeline connection error toggling status.");
+                checkboxElement.checked = !checkboxElement.checked;
+            }
+        }
+
+        // 4. Learning Paths Milestone Track Toggle Logic
+        async function toggleMilestoneStatus(checkboxElement) {
+            const milestoneId = checkboxElement.getAttribute('data-id');
+            const labelSpan = checkboxElement.nextElementSibling;
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+
+            try {
+                const response = await fetch(`/api/milestones/${milestoneId}/toggle/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrfToken
+                    }
+                });
+                const data = await response.json();
+                
+                if (response.ok && data.status === 'success') {
+                    if (data.is_mastered) {
+                        labelSpan.style.textDecoration = "line-through";
+                        labelSpan.style.color = "var(--text-muted)";
+                    } else {
+                        labelSpan.style.textDecoration = "none";
+                        labelSpan.style.color = "var(--text)";
+                    }
+                } else {
+                    alert("Roadmap tracking modification rejected.");
+                    checkboxElement.checked = !checkboxElement.checked;
+                }
+            } catch (err) {
+                alert("Network connection error updating milestone profile.");
+                checkboxElement.checked = !checkboxElement.checked;
+            }
+        }
+
+        // 5. Toggle Interview Modal Display
+function toggleInterviewModal(show) {
+    const modal = document.getElementById('interview-modal');
+    modal.style.display = show ? 'flex' : 'none';
+    if (!show) document.getElementById('interview-form').reset();
+}
+
+// 6. Async Interview Form Submission Engine
+document.getElementById('interview-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const formData = new FormData(e.target);
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+    
+    // Package fields into JSON payload
+    const payload = {
+        company_name: formData.get('company_name'),
+        role_title: formData.get('role_title'),
+        status: formData.get('status'),
+        date_scheduled: formData.get('date_scheduled')
+    };
+
+    try {
+        const response = await fetch('/api/interviews/create/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify(payload)
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok && data.status === 'success') {
+            toggleInterviewModal(false);
+            window.location.reload(); // Refresh to reflect changes instantly
+        } else {
+            alert(data.message || "Pipeline entry rejected by server.");
+        }
+    } catch (err) {
+        alert("Network failure attempting to sync corporate pipeline tracking.");
+    }
+});
+    </script>
+</body>
+
+</html>

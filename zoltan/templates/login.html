@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Login | Zoltan</title>
+    <meta name="description" content="Log in to your Zoltan administrative workspace.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --primary-light: #eef2ff;
+            --bg: #0f1117;
+            --bg-card: #191c24;
+            --bg-input: #1e2230;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #2d3348;
+            --success: #22c55e;
+            --error: #ef4444;
+            --glow: rgba(79, 70, 229, 0.25);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* Animated background gradient orbs */
+        body::before, body::after {
+            content: '';
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.4;
+            z-index: 0;
+            animation: float 8s ease-in-out infinite;
+        }
+        body::before {
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, #4f46e5, transparent);
+            top: -150px; left: -100px;
+        }
+        body::after {
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, #7c3aed, transparent);
+            bottom: -100px; right: -80px;
+            animation-delay: -4s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-30px) scale(1.05); }
+        }
+
+        .login-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 2.5rem;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4), 0 0 80px var(--glow);
+            position: relative;
+            z-index: 1;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        h2 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            color: var(--text);
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 1.75rem;
+            line-height: 1.4;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.4rem;
+            font-weight: 500;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        input {
+            width: 100%;
+            padding: 0.7rem 0.9rem;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--glow);
+        }
+
+        input::placeholder {
+            color: #4b5563;
+        }
+
+        .btn-primary {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary), #6366f1);
+            color: white;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.2s, opacity 0.2s;
+            font-family: inherit;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 25px var(--glow);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Shimmer animation on button */
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+            animation: shimmer 2.5s infinite;
+        }
+
+        @keyframes shimmer {
+            100% { left: 100%; }
+        }
+
+        .hidden { display: none !important; }
+
+        .error-msg {
+            color: var(--error);
+            font-size: 0.82rem;
+            margin-top: 0.5rem;
+            min-height: 1.2rem;
+        }
+
+        .signup-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .signup-link a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .signup-link a:hover {
+            color: #818cf8;
+        }
+
+        /* OTP Input Styling */
+        .otp-input-wrapper {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .otp-input-wrapper input {
+            width: 48px;
+            height: 56px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 0;
+            padding: 0;
+            border-radius: 10px;
+            background: var(--bg-input);
+            border: 2px solid var(--border);
+            color: var(--text);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .otp-input-wrapper input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--glow);
+        }
+
+        .otp-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(79, 70, 229, 0.15);
+            color: #a5b4fc;
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            cursor: pointer;
+            margin-top: 1rem;
+            text-align: center;
+            width: 100%;
+            justify-content: center;
+            transition: color 0.2s;
+            background: none;
+            border: none;
+            font-family: inherit;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        /* Step transition animation */
+        .step-enter {
+            animation: fadeSlideIn 0.35s ease-out;
+        }
+
+        @keyframes fadeSlideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .timer-text {
+            text-align: center;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .timer-text span {
+            color: var(--primary);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+
+    <!-- ========== STEP 1: Email & Password ========== -->
+    <div id="step-1">
+        <div class="logo">⚡ Zoltan</div>
+        <h2>Welcome Back</h2>
+        <p class="subtitle">Enter your credentials to access the workspace.</p>
+
+        <form id="cred-form">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" required placeholder="you@example.com" autocomplete="email">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" required placeholder="••••••••" autocomplete="current-password">
+            </div>
+            <button type="submit" id="login-btn" class="btn-primary">Verify Credentials</button>
+            <div id="error-step-1" class="error-msg"></div>
+        </form>
+
+        <div class="signup-link">
+            Don't have an account? <a href="{% url 'signup_page' %}">Create one</a>
+        </div>
+    </div>
+
+    <!-- ========== STEP 2: OTP Verification ========== -->
+    <div id="step-2" class="hidden">
+        <div class="logo">⚡ Zoltan</div>
+        <h2>Verify Your Identity</h2>
+        <p class="subtitle">A 6-digit security code was sent to your email and printed in the server console.</p>
+
+        <div class="otp-badge">🔒 Multi-Factor Authentication</div>
+
+        <form id="otp-form">
+            {% csrf_token %}
+            <div class="otp-input-wrapper" id="otp-inputs">
+                <input type="text" maxlength="1" pattern="\d" inputmode="numeric" class="otp-digit" autofocus>
+                <input type="text" maxlength="1" pattern="\d" inputmode="numeric" class="otp-digit">
+                <input type="text" maxlength="1" pattern="\d" inputmode="numeric" class="otp-digit">
+                <input type="text" maxlength="1" pattern="\d" inputmode="numeric" class="otp-digit">
+                <input type="text" maxlength="1" pattern="\d" inputmode="numeric" class="otp-digit">
+                <input type="text" maxlength="1" pattern="\d" inputmode="numeric" class="otp-digit">
+            </div>
+            <div class="timer-text">Code expires in <span id="otp-timer">3:00</span></div>
+            <button type="submit" id="otp-btn" class="btn-primary">Authorize & Log In</button>
+            <div id="error-step-2" class="error-msg"></div>
+        </form>
+
+        <button class="back-link" onclick="goBackToStep1()">← Back to credentials</button>
+    </div>
+
+</div>
+
+<script>
+    let storedEmail = '';
+    let timerInterval = null;
+
+    // ===== STEP 1: Credential Submission =====
+    document.getElementById('cred-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        const errorDiv = document.getElementById('error-step-1');
+        const btn = document.getElementById('login-btn');
+        const csrfToken = document.querySelector('#cred-form [name=csrfmiddlewaretoken]').value;
+
+        errorDiv.innerText = '';
+        btn.disabled = true;
+        btn.innerText = 'Verifying...';
+
+        try {
+            const response = await fetch('/admin-login-step1/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({ email, password })
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.status === 'success') {
+                storedEmail = email;
+                // Switch to Step 2
+                document.getElementById('step-1').classList.add('hidden');
+                const step2 = document.getElementById('step-2');
+                step2.classList.remove('hidden');
+                step2.classList.add('step-enter');
+
+                // Focus first OTP digit
+                document.querySelector('.otp-digit').focus();
+
+                // Start countdown timer
+                startOTPTimer(180); // 3 minutes
+            } else {
+                errorDiv.innerText = data.message || 'Invalid credentials.';
+            }
+        } catch (err) {
+            errorDiv.innerText = 'Connection error. Please try again.';
+        } finally {
+            btn.disabled = false;
+            btn.innerText = 'Verify Credentials';
+        }
+    });
+
+    // ===== OTP Input Auto-advance =====
+    const otpInputs = document.querySelectorAll('.otp-digit');
+
+    otpInputs.forEach((input, index) => {
+        input.addEventListener('input', (e) => {
+            // Only allow digits
+            e.target.value = e.target.value.replace(/\D/g, '');
+            if (e.target.value && index < otpInputs.length - 1) {
+                otpInputs[index + 1].focus();
+            }
+        });
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                otpInputs[index - 1].focus();
+            }
+        });
+
+        // Handle paste of full OTP
+        input.addEventListener('paste', (e) => {
+            e.preventDefault();
+            const pastedData = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '');
+            for (let i = 0; i < otpInputs.length && i < pastedData.length; i++) {
+                otpInputs[i].value = pastedData[i];
+            }
+            const focusIndex = Math.min(pastedData.length, otpInputs.length - 1);
+            otpInputs[focusIndex].focus();
+        });
+    });
+
+    // ===== STEP 2: OTP Submission =====
+    document.getElementById('otp-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const otp = Array.from(otpInputs).map(i => i.value).join('');
+        const errorDiv = document.getElementById('error-step-2');
+        const btn = document.getElementById('otp-btn');
+        const csrfToken = document.querySelector('#otp-form [name=csrfmiddlewaretoken]').value;
+
+        if (otp.length !== 6) {
+            errorDiv.innerText = 'Please enter the full 6-digit code.';
+            return;
+        }
+
+        errorDiv.innerText = '';
+        btn.disabled = true;
+        btn.innerText = 'Authorizing...';
+
+        try {
+            const response = await fetch('/admin-login-step2/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({ email: storedEmail, otp: otp })
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.status === 'success') {
+                window.location.href = data.redirect_url || '/dashboard/';
+            } else {
+                errorDiv.innerText = data.message || 'Invalid or expired OTP.';
+                // Clear inputs on error
+                otpInputs.forEach(i => i.value = '');
+                otpInputs[0].focus();
+            }
+        } catch (err) {
+            errorDiv.innerText = 'Verification failed. Please try again.';
+        } finally {
+            btn.disabled = false;
+            btn.innerText = 'Authorize & Log In';
+        }
+    });
+
+    // ===== OTP Countdown Timer =====
+    function startOTPTimer(totalSeconds) {
+        clearInterval(timerInterval);
+        let remaining = totalSeconds;
+        const timerEl = document.getElementById('otp-timer');
+
+        function updateDisplay() {
+            const mins = Math.floor(remaining / 60);
+            const secs = remaining % 60;
+            timerEl.innerText = `${mins}:${secs.toString().padStart(2, '0')}`;
+
+            if (remaining <= 30) {
+                timerEl.style.color = '#ef4444';
+            }
+        }
+
+        updateDisplay();
+        timerInterval = setInterval(() => {
+            remaining--;
+            updateDisplay();
+            if (remaining <= 0) {
+                clearInterval(timerInterval);
+                timerEl.innerText = 'Expired';
+                timerEl.style.color = '#ef4444';
+            }
+        }, 1000);
+    }
+
+    // ===== Go Back =====
+    function goBackToStep1() {
+        clearInterval(timerInterval);
+        document.getElementById('step-2').classList.add('hidden');
+        document.getElementById('step-1').classList.remove('hidden');
+        otpInputs.forEach(i => i.value = '');
+        document.getElementById('error-step-2').innerText = '';
+    }
+</script>
+
+</body>
+</html>
