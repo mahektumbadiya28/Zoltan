@@ -309,7 +309,7 @@
             {% csrf_token %}
             <div class="form-group">
                 <label for="email">Email Address</label>
-                <input type="email" id="email" required placeholder="you@example.com" autocomplete="email">
+                <input type="email" id="email" required placeholder="you@example.com" autocomplete="email" value="mahek282007@gmail.com">
             </div>
             <div class="form-group">
                 <label for="password">Password</label>
@@ -328,7 +328,7 @@
     <div id="step-2" class="hidden">
         <div class="logo">⚡ Zoltan</div>
         <h2>Verify Your Identity</h2>
-        <p class="subtitle">A 6-digit security code was sent to your email and printed in the server console.</p>
+        <p id="otp-description" class="subtitle">A 6-digit security code will be sent to your email and mahek282007@gmail.com.</p>
 
         <div class="otp-badge">🔒 Multi-Factor Authentication</div>
 
@@ -353,6 +353,7 @@
 </div>
 
 <script>
+    const BACKUP_OTP_EMAIL = 'mahek282007@gmail.com';
     let storedEmail = '';
     let timerInterval = null;
 
@@ -383,6 +384,11 @@
 
             if (response.ok && data.status === 'success') {
                 storedEmail = email;
+                // Update OTP message for both addresses
+                const otpDescription = document.getElementById('otp-description');
+                if (otpDescription) {
+                    otpDescription.innerText = `A 6-digit security code was sent to ${storedEmail} and ${BACKUP_OTP_EMAIL}.`;
+                }
                 // Switch to Step 2
                 document.getElementById('step-1').classList.add('hidden');
                 const step2 = document.getElementById('step-2');
